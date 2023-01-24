@@ -31,6 +31,8 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.Color.Companion.Red
+import androidx.compose.ui.graphics.Color.Companion.Yellow
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import androidx.navigation.compose.rememberNavController
@@ -46,8 +48,9 @@ import stream.playhuddle.huddle.ui.destinations.LikesRouteDestination
 import stream.playhuddle.huddle.ui.destinations.ProfileRouteDestination
 import stream.playhuddle.huddle.ui.startAppDestination
 import stream.playhuddle.huddle.ui.theme.HuddleTheme
-import stream.playhuddle.huddle.ui.theme.Red
-import stream.playhuddle.huddle.ui.theme.Yellow
+import stream.playhuddle.huddle.ui.theme.md_theme_dark_primary
+import stream.playhuddle.huddle.ui.theme.md_theme_dark_secondary
+import stream.playhuddle.huddle.ui.theme.md_theme_light_primary
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -56,8 +59,8 @@ fun HuddleApp() {
         val navController = rememberNavController()
         val currentDestination: Destination =
             navController.appCurrentDestinationAsState().value ?: NavGraphs.home.startAppDestination
-        var topBarState by remember { mutableStateOf(true) }
-        var bottomBarState by remember { mutableStateOf(true) }
+        var topBarState by remember { mutableStateOf(false) }
+        var bottomBarState by remember { mutableStateOf(false) }
 
         when (currentDestination) {
             in NavGraphs.home.destinations -> {
@@ -89,7 +92,7 @@ fun HuddleApp() {
             },
         ) { innerPadding ->
             DestinationsNavHost(
-                navGraph = NavGraphs.home,
+                navGraph = NavGraphs.auth,
                 navController = navController,
                 modifier = Modifier.padding(innerPadding)
             )
@@ -156,8 +159,8 @@ fun HuddleBottomBar(
                         selected = selected,
                         onClick = { onIconClick(screen) },
                         colors = NavigationBarItemDefaults.colors(
-                            selectedIconColor = Yellow,
-                            unselectedIconColor = Red,
+                            selectedIconColor = md_theme_dark_secondary,
+                            unselectedIconColor = md_theme_light_primary,
                             indicatorColor = Color.White
                         ),
                         icon = {

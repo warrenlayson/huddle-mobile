@@ -22,12 +22,25 @@ val Bebas = FontFamily(
 // Set of Material typography styles to start with
 val Typography = Typography(
     bodyLarge = TextStyle(
-        fontFamily = FontFamily.Default,
+        fontFamily = Glacial,
         fontWeight = FontWeight.Normal,
         fontSize = 16.sp,
         lineHeight = 24.sp,
         letterSpacing = 0.5.sp
+    ),
+    labelLarge = TextStyle(
+        fontFamily = Glacial,
+        lineHeight = 20.0.sp,
+        fontSize = 14.sp,
+        letterSpacing = 0.1.sp,
+        fontWeight = FontWeight.Medium
+//        val LabelLargeFont = TypefaceTokens.Plain
+//            val LabelLargeLineHeight = 20.0.sp
+//    val LabelLargeSize = 14.sp
+//val LabelLargeTracking = 0.1.sp
+//val LabelLargeWeight = TypefaceTokens.WeightMedium
     )
+
     /* Other default text styles to override
     titleLarge = TextStyle(
         fontFamily = FontFamily.Default,

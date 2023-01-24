@@ -4,7 +4,7 @@ import androidx.compose.runtime.Composable
 import com.ramcosta.composedestinations.annotation.Destination
 import stream.playhuddle.huddle.utils.AuthNavGraph
 
-@AuthNavGraph(start = true)
+@AuthNavGraph()
 @Destination
 @Composable
 fun SignUpRoute() {
