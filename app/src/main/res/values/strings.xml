@@ -1,3 +1,12 @@
 <resources>
-    <string name="app_name">huddle</string>
+    <string name="app_name">Huddle</string>
+    <string name="username_label">Username</string>
+    <string name="age_label">Age</string>
+    <string name="location_label">Location</string>
+    <string name="interests_label">Interests</string>
+    <string name="bio_label">Bio</string>
+    <string name="create_profile">Create Profile</string>
+    <string name="start_swiping">Start swiping!</string>
+    <string name="welcome_to_huddle">Welcome to Huddle,</string>
+    <string name="profile_created">Profile has \n been created!</string>
 </resources>

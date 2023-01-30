@@ -39,6 +39,18 @@ val Typography = Typography(
 //    val LabelLargeSize = 14.sp
 //val LabelLargeTracking = 0.1.sp
 //val LabelLargeWeight = TypefaceTokens.WeightMedium
+    ),
+    headlineMedium = TextStyle(
+        fontFamily = Glacial,
+        lineHeight = 36.sp,
+        fontSize = 28.sp,
+        letterSpacing = 0.0.sp,
+        fontWeight = FontWeight.Normal
+//        val HeadlineMediumFont = TypefaceTokens.Brand
+//            val HeadlineMediumLineHeight = 36.0.sp
+//    val HeadlineMediumSize = 28.sp
+//val HeadlineMediumTracking = 0.0.sp
+//val HeadlineMediumWeight = TypefaceTokens.WeightRegular
     )
 
     /* Other default text styles to override

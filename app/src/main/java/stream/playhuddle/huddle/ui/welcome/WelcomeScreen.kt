@@ -2,7 +2,6 @@ package stream.playhuddle.huddle.ui.welcome
 
 import android.view.ViewGroup
 import android.widget.ImageView
-import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -20,7 +19,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.tooling.preview.Preview
@@ -30,6 +28,7 @@ import androidx.compose.ui.viewinterop.AndroidView
 import com.ramcosta.composedestinations.annotation.Destination
 import com.ramcosta.composedestinations.navigation.DestinationsNavigator
 import stream.playhuddle.huddle.R
+import stream.playhuddle.huddle.ui.composables.LogoWithText
 import stream.playhuddle.huddle.ui.destinations.SignUpRouteDestination
 import stream.playhuddle.huddle.ui.theme.md_theme_dark_secondary
 import stream.playhuddle.huddle.ui.theme.md_theme_dark_tertiary
@@ -66,9 +65,7 @@ private fun WelcomeScreen(modifier: Modifier = Modifier, navigateToSignUp: () ->
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.SpaceBetween,
         ) {
-            Image(
-                painter = painterResource(id = R.drawable.huddle_logo_with_word),
-                contentDescription = "Logo",
+            LogoWithText(
                 modifier = Modifier.padding(top = 80.dp)
             )
 
