@@ -2,4 +2,12 @@
 <resources>
 
     <style name="Theme.Huddle" parent="android:Theme.Material.Light.NoActionBar" />
+
+    <style name="Theme.App.Starting" parent="Theme.SplashScreen">
+        <item name="windowSplashScreenIconBackgroundColor">@color/white</item>
+
+        <item name="windowSplashScreenAnimatedIcon">@drawable/huddle_logo</item>
+
+        <item name="postSplashScreenTheme">@style/Theme.Huddle</item>
+    </style>
 </resources>

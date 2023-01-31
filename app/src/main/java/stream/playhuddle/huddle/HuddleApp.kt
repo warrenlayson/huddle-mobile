@@ -54,7 +54,7 @@ import stream.playhuddle.huddle.ui.theme.md_theme_light_primary
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun HuddleApp() {
+fun HuddleApp(startingGraph: NavGraphSpec) {
     HuddleTheme(dynamicColor = false, darkTheme = false) {
         val navController = rememberNavController()
         val currentDestination: Destination =
@@ -92,9 +92,10 @@ fun HuddleApp() {
             },
         ) { innerPadding ->
             DestinationsNavHost(
-                navGraph = NavGraphs.auth,
                 navController = navController,
-                modifier = Modifier.padding(innerPadding)
+                navGraph = NavGraphs.root,
+                startRoute = startingGraph,
+                modifier = Modifier.padding(it)
             )
         }
     }
