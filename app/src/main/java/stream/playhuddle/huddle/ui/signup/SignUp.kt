@@ -42,33 +42,39 @@ import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.ramcosta.composedestinations.annotation.Destination
+import com.ramcosta.composedestinations.navigation.DestinationsNavigator
 import stream.playhuddle.huddle.R
 import stream.playhuddle.huddle.ui.composables.Banner
 import stream.playhuddle.huddle.ui.composables.LogoWithText
+import stream.playhuddle.huddle.ui.destinations.HomeRouteDestination
 import stream.playhuddle.huddle.ui.theme.HuddleTheme
 import stream.playhuddle.huddle.utils.AuthNavGraph
 
 @AuthNavGraph
 @Destination
 @Composable
-fun SignUpRoute() {
+fun SignUpRoute(navigator: DestinationsNavigator) {
     val viewModel: SignUpViewModel = hiltViewModel()
     val uiState by viewModel.uiState.collectAsState()
-    SignUpScreen(uiState = uiState, onEvent = viewModel::onEvent)
+    SignUpScreen(
+        uiState = uiState,
+        onEvent = viewModel::onEvent,
+        onNavigateToHome = { navigator.navigate(HomeRouteDestination) })
 }
 
 @Composable
 private fun SignUpScreen(
     uiState: SignUpUiState,
     modifier: Modifier = Modifier,
-    onEvent: (SignUpEvent) -> Unit = {}
+    onEvent: (SignUpEvent) -> Unit = {},
+    onNavigateToHome: () -> Unit = {},
 ) {
 
     if (uiState.showBanner) {
         Dialog(onDismissRequest = { onEvent(SignUpEvent.ShowDialog(false)) }) {
             Banner(
                 name = uiState.username,
-                onClick = { onEvent(SignUpEvent.ShowDialog(false)) },
+                onClick = onNavigateToHome,
                 modifier = Modifier.heightIn(min = 400.dp)
             )
         }

@@ -9,4 +9,5 @@ sealed class SignUpEvent {
     data class ShowDialog(val value: Boolean) : SignUpEvent()
 
     object OnSave : SignUpEvent()
+    object StartSwiping : SignUpEvent()
 }

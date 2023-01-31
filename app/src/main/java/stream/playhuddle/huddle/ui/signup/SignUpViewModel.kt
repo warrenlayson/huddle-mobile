@@ -1,14 +1,19 @@
 package stream.playhuddle.huddle.ui.signup
 
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
+import kotlinx.coroutines.launch
+import stream.playhuddle.huddle.data.HuddlePreferencesDataSource
 import javax.inject.Inject
 
 @HiltViewModel
-class SignUpViewModel @Inject constructor() : ViewModel() {
+class SignUpViewModel @Inject constructor(
+    private val huddlePreferencesDataSource: HuddlePreferencesDataSource
+) : ViewModel() {
 
     private val _uiState = MutableStateFlow(SignUpUiState())
     val uiState = _uiState.asStateFlow()
@@ -20,10 +25,31 @@ class SignUpViewModel @Inject constructor() : ViewModel() {
             is SignUpEvent.OnInterestsChange -> _uiState.update { it.copy(interests = event.value) }
             is SignUpEvent.OnLocationChange -> _uiState.update { it.copy(location = event.value) }
             is SignUpEvent.OnUsernameChange -> _uiState.update { it.copy(username = event.value) }
-            is SignUpEvent.ShowDialog -> _uiState.update { it.copy(showBanner = event.value) }
-            SignUpEvent.OnSave -> {}
+            is SignUpEvent.ShowDialog -> showDialog(event.value)
+            SignUpEvent.OnSave -> {
+                viewModelScope.launch {
+                    uiState.value.run {
+                        huddlePreferencesDataSource.setProfile(
+                            username = username,
+                            age = age.toInt(),
+                            location = location,
+                            interests = interests,
+                            bio = bio,
+                        )
+                    }
+                }
+
+                showDialog(true)
+            }
+            SignUpEvent.StartSwiping -> viewModelScope.launch {
+                huddlePreferencesDataSource.toggleOnboarded(
+                    true
+                )
+            }
         }
     }
+
+    private fun showDialog(value: Boolean) = _uiState.update { it.copy(showBanner = value) }
 
 }
 
