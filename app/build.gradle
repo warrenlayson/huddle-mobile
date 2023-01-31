@@ -5,6 +5,7 @@ plugins {
     id 'com.google.dagger.hilt.android'
     id 'kotlin-kapt'
     id 'com.google.devtools.ksp' version '1.8.0-1.0.8'
+    id 'com.google.protobuf' version '0.9.1'
 }
 
 android {
@@ -80,6 +81,10 @@ dependencies {
     debugImplementation "androidx.compose.ui:ui-test-manifest"
     androidTestImplementation "androidx.compose.ui:ui-test-junit4"
 
+    // datastore
+    implementation "androidx.datastore:datastore:1.0.0"
+    implementation "com.google.protobuf:protobuf-kotlin-lite:3.21.12"
+
     // firebase
     implementation platform("com.google.firebase:firebase-bom:$firebase_bom")
 
@@ -102,6 +107,26 @@ dependencies {
     testImplementation 'junit:junit:4.13.2'
     androidTestImplementation 'androidx.test.ext:junit:1.1.5'
     androidTestImplementation 'androidx.test.espresso:espresso-core:3.5.1'
+}
+
+protobuf {
+    protoc {
+        artifact = "com.google.protobuf:protoc:3.21.12"
+    }
+
+    generateProtoTasks {
+        all().each { task ->
+            task.builtins {
+                java {
+                    option 'lite'
+                }
+                kotlin {
+                    option 'lite'
+                }
+            }
+
+        }
+    }
 }
 
 kapt {

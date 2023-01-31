@@ -1,0 +1,13 @@
+syntax = 'proto3';
+
+option java_package = "stream.playhuddle.huddle";
+option java_multiple_files = true;
+
+message UserPreferences {
+  string username = 1;
+  int32 age = 2;
+  string location = 3;
+  string interests = 4;
+  string bio = 5;
+  bool onboarded = 6;
+}
