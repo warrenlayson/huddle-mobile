@@ -101,6 +101,9 @@ dependencies {
     // splash screen
     implementation 'androidx.core:core-splashscreen:1.0.0'
 
+    // accompanist
+    implementation "com.google.accompanist:accompanist-pager:$accompanist_version"
+
     // coil
     implementation "io.coil-kt:coil-bom:$coil_version"
     implementation "io.coil-kt:coil"
