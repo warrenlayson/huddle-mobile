@@ -17,6 +17,7 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.material3.AlertDialog
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -26,6 +27,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -49,6 +51,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.zIndex
 import androidx.core.content.ContextCompat
+import androidx.hilt.navigation.compose.hiltViewModel
 import com.google.accompanist.pager.ExperimentalPagerApi
 import com.google.accompanist.pager.HorizontalPager
 import com.google.accompanist.pager.rememberPagerState
@@ -72,20 +75,28 @@ import stream.playhuddle.huddle.utils.sendNotification
 @Destination
 @Composable
 fun HomeRoute(navigator: DestinationsNavigator) {
-    HomeScreen(navigateToInbox = {
-        navigator.navigate(InboxRouteDestination) {
-            popUpTo(HomeRouteDestination) {
-                inclusive = true
+    val viewModel = hiltViewModel<HomeViewModel>()
+    val uiState by viewModel.uiState.collectAsState()
+    HomeScreen(
+        navigateToInbox = {
+            navigator.navigate(InboxRouteDestination) {
+                popUpTo(HomeRouteDestination) {
+                    inclusive = true
+                }
             }
-        }
-    })
+        },
+        uiState = uiState
+    )
 }
 
 const val MAX_PAGE = 7
 
 @OptIn(ExperimentalPagerApi::class)
 @Composable
-private fun HomeScreen(navigateToInbox: () -> Unit = {}) {
+private fun HomeScreen(
+    uiState: HomeUiState,
+    navigateToInbox: () -> Unit = {},
+) {
 
     val scope = rememberCoroutineScope()
     val pagerState = rememberPagerState(initialPage = 0)
@@ -95,46 +106,55 @@ private fun HomeScreen(navigateToInbox: () -> Unit = {}) {
         state = pagerState
     ) { page ->
         Box(modifier = Modifier) {
-            IconButton(
-                onClick = {
-                    scope.launch { pagerState.scrollToPage(currentPage - 1) }
-                },
-                modifier = Modifier
-                    .align(Alignment.CenterStart)
-                    .zIndex(99f),
-                enabled = currentPage > 0
-            ) {
-                Icon(
-                    painter = painterResource(id = R.drawable.black_swipe),
-                    contentDescription = "Left swipe",
-                    tint = if (currentPage > 0) Color(0xffd93542) else Color.Black,
-                    modifier = Modifier.size(100.dp)
-                )
-            }
-            IconButton(
-                onClick = {
-                    scope.launch { pagerState.scrollToPage(currentPage + 1) }
-                },
-                modifier = Modifier
-                    .align(Alignment.CenterEnd)
-                    .zIndex(99f),
-                enabled = page + 1 < MAX_PAGE
-            ) {
-                Icon(
-                    painter = painterResource(id = R.drawable.right_swipe),
-                    contentDescription = "Right swipe",
-                    tint = if (currentPage + 1 == MAX_PAGE) Color.Black else Color(0xffd93542),
-                    modifier = Modifier.size(100.dp)
-                )
-            }
-            when (page) {
-                0 -> PageOne()
-                1 -> PageTwo()
-                2 -> PageThree()
-                3 -> PageFour()
-                4 -> PageFive()
-                5 -> PageSix()
-                6 -> PageSeven(username = "MusicLover555")
+            when (uiState) {
+                HomeUiState.Loading -> {
+                    CircularProgressIndicator(modifier = Modifier.align(Alignment.Center))
+                }
+                is HomeUiState.Success -> {
+                    IconButton(
+                        onClick = {
+                            scope.launch { pagerState.scrollToPage(currentPage - 1) }
+                        },
+                        modifier = Modifier
+                            .align(Alignment.CenterStart)
+                            .zIndex(99f),
+                        enabled = currentPage > 0
+                    ) {
+                        Icon(
+                            painter = painterResource(id = R.drawable.black_swipe),
+                            contentDescription = "Left swipe",
+                            tint = if (currentPage > 0) Color(0xffd93542) else Color.Black,
+                            modifier = Modifier.size(100.dp)
+                        )
+                    }
+                    IconButton(
+                        onClick = {
+                            scope.launch { pagerState.scrollToPage(currentPage + 1) }
+                        },
+                        modifier = Modifier
+                            .align(Alignment.CenterEnd)
+                            .zIndex(99f),
+                        enabled = page + 1 < MAX_PAGE
+                    ) {
+                        Icon(
+                            painter = painterResource(id = R.drawable.right_swipe),
+                            contentDescription = "Right swipe",
+                            tint = if (currentPage + 1 == MAX_PAGE) Color.Black else Color(
+                                0xffd93542
+                            ),
+                            modifier = Modifier.size(100.dp)
+                        )
+                    }
+                    when (page) {
+                        0 -> PageOne(uiState.user)
+                        1 -> PageTwo()
+                        2 -> PageThree()
+                        3 -> PageFour()
+                        4 -> PageFive()
+                        5 -> PageSix()
+                        6 -> PageSeven(username = uiState.user.username)
+                    }
+                }
             }
         }
     }
@@ -352,16 +372,9 @@ private fun PageTwo() {
 }
 
 @Composable
-private fun PageOne() {
+private fun PageOne(user: User) {
     Page(
-        user = User(
-            "MusicLover555",
-            age = 21,
-            location = "Metro Manila",
-            interests = "Watching TV & Films, Foodie, Bands",
-            bio = "Just someone to talk with :)",
-            onboarded = true
-        ),
+        user = user,
         imageRes = R.drawable.user,
     )
 }
@@ -439,11 +452,20 @@ private fun Page(user: User, @DrawableRes imageRes: Int, modifier: Modifier = Mo
     }
 }
 
+private val user = User(
+    username = "MusicLover555",
+    age = 21,
+    location = "Metro Manila",
+    bio = "Just someone to talk with :)",
+    interests = "New Jeans",
+    onboarded = true
+)
+
 
 @Preview(showBackground = true)
 @Composable
 fun HomeScreenPreview() {
     HuddleTheme {
-        HomeScreen()
+        HomeScreen(uiState = HomeUiState.Success(user))
     }
 }
