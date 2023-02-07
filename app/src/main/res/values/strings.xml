@@ -13,4 +13,7 @@
     <string name="huddle_notification_channel_id" translatable="false">huddle-channel-id</string>
     <string name="huddle_notification_name" translatable="true">Match</string>
     <string name="huddle_notification_description">Match</string>
+    <string name="email_label">Email</string>
+    <string name="password_label">Password</string>
+    <string name="login">Login</string>
 </resources>
