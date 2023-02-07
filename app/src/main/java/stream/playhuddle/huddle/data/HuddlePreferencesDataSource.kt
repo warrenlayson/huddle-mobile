@@ -11,30 +11,9 @@ class HuddlePreferencesDataSource @Inject constructor(
 ) {
 
     val userData = userPreferencesDatasource.data.map {
-        User(
-            username = it.username,
-            age = it.age,
-            location = it.location,
-            interests = it.interests,
-            bio = it.bio,
+        UserData(
             onboarded = it.onboarded
         )
-    }
-
-    suspend fun setProfile(
-        username: String,
-        age: Int,
-        location: String,
-        bio: String,
-        interests: String
-    ) = userPreferencesDatasource.updateData {
-        it.copy {
-            this.username = username
-            this.age = age
-            this.location = location
-            this.bio = bio
-            this.interests = interests
-        }
     }
 
     suspend fun toggleOnboarded(value: Boolean) =

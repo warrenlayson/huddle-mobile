@@ -16,6 +16,8 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -27,7 +29,6 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -52,6 +53,7 @@ import androidx.compose.ui.unit.sp
 import androidx.compose.ui.zIndex
 import androidx.core.content.ContextCompat
 import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.google.accompanist.pager.ExperimentalPagerApi
 import com.google.accompanist.pager.HorizontalPager
 import com.google.accompanist.pager.rememberPagerState
@@ -60,7 +62,7 @@ import com.ramcosta.composedestinations.navigation.DestinationsNavigator
 import com.ramcosta.composedestinations.navigation.popUpTo
 import kotlinx.coroutines.launch
 import stream.playhuddle.huddle.R
-import stream.playhuddle.huddle.data.User
+import stream.playhuddle.huddle.data.Profile
 import stream.playhuddle.huddle.ui.destinations.HomeRouteDestination
 import stream.playhuddle.huddle.ui.destinations.InboxRouteDestination
 import stream.playhuddle.huddle.ui.theme.Bebas
@@ -76,7 +78,7 @@ import stream.playhuddle.huddle.utils.sendNotification
 @Composable
 fun HomeRoute(navigator: DestinationsNavigator) {
     val viewModel = hiltViewModel<HomeViewModel>()
-    val uiState by viewModel.uiState.collectAsState()
+    val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     HomeScreen(
         navigateToInbox = {
             navigator.navigate(InboxRouteDestination) {
@@ -107,6 +109,9 @@ private fun HomeScreen(
     ) { page ->
         Box(modifier = Modifier) {
             when (uiState) {
+                HomeUiState.Error -> {
+                    Text(text = "Error", modifier = Modifier.align(Alignment.Center))
+                }
                 HomeUiState.Loading -> {
                     CircularProgressIndicator(modifier = Modifier.align(Alignment.Center))
                 }
@@ -146,13 +151,13 @@ private fun HomeScreen(
                         )
                     }
                     when (page) {
-                        0 -> PageOne(uiState.user)
+                        0 -> uiState.profile?.let { PageOne(it) }
                         1 -> PageTwo()
                         2 -> PageThree()
                         3 -> PageFour()
                         4 -> PageFive()
                         5 -> PageSix()
-                        6 -> PageSeven(username = uiState.user.username)
+                        6 -> uiState.profile?.let { PageSeven(username = it.username) }
                     }
                 }
             }
@@ -165,11 +170,10 @@ private fun HomeScreen(
 private fun PageSeven(username: String) {
     var open by remember { mutableStateOf(false) }
     Page(
-        user = User(
+        Profile(
             username = "Its_me_Paulo_97",
             interests = "Arts, Bands, Entrepreneur, Swimming",
             bio = "Trader \n  \n \"I work for success.\"",
-            onboarded = false,
             age = 25,
             location = "Manila"
         ), imageRes = R.drawable.paulo,
@@ -289,13 +293,12 @@ fun MatchBanner(username: String) {
 @Composable
 private fun PageSix() {
     Page(
-        user = User(
+        Profile(
             username = "ArtsanddesignAfficionado",
             interests = "Arts, Designs, Creativity",
             bio = "Prod. design/Make-up artist/costume - Aira Annegeline Yanes & Mary Rose Malabayabas" +
                     "\nCreatives/Design - Dylan James Paulino" +
                     "\nMarketing and Promotions - Thea Marie Templanza & Rosebell Canlas",
-            onboarded = false,
             age = -1,
             location = ""
         ), imageRes = R.drawable.art
@@ -305,7 +308,7 @@ private fun PageSix() {
 @Composable
 private fun PageFive() {
     Page(
-        user = User(
+        Profile(
             username = "PicturesqueCutie999",
             interests = "Photography, Graphic Design",
             bio = "Direction of Photography - Danica Montralbo" +
@@ -313,7 +316,6 @@ private fun PageFive() {
                     "\nEditor - Jony Pagkaliwangan" +
                     "\nEditor/Creatives - Shaina Rogel" +
                     "\nWeb & App Developer - Warren Layson",
-            onboarded = false,
             age = -1,
             location = ""
         ), imageRes = R.drawable.prod
@@ -323,14 +325,13 @@ private fun PageFive() {
 @Composable
 private fun PageFour() {
     Page(
-        user = User(
+        Profile(
             username = "SerialWriter",
             interests = "Scriptwriting, Watching Movies",
             bio = "Asst. Producer/Scriptwriter - Monica Antonio" +
                     "\nHead Scriptwriter - Francheska Sastre" +
                     "\nWriter - Lenny Marie Garcia",
             age = -1,
-            onboarded = true,
             location = ""
         ),
         imageRes = R.drawable.serial_writer
@@ -340,14 +341,13 @@ private fun PageFour() {
 @Composable
 private fun PageThree() {
     Page(
-        user = User(
+        Profile(
             username = "NextGen_Leaders",
             interests = "Film, Arts, Movies and Chill",
             bio = "Director - Rayven Daligcon" +
                     "\nAssistant Director - Harold Lemon Tubiano" +
                     "\nExecutive Producer - Nikka Avegail Sabio",
             location = "",
-            onboarded = true,
             age = -1
         ),
         imageRes = R.drawable.camera,
@@ -357,30 +357,29 @@ private fun PageThree() {
 @Composable
 private fun PageTwo() {
     Page(
-        user = User(
-            "Sinulid Productions",
+        Profile(
+            username = "Sinulid Productions",
             age = -1,
             location = "",
             interests = "Short Film Production" +
                     "\n\nStudent-led Production House" +
                     "\nSocial Media Awareness",
             bio = "",
-            onboarded = true
         ),
         imageRes = R.drawable.sinulid,
     )
 }
 
 @Composable
-private fun PageOne(user: User) {
+private fun PageOne(profile: Profile) {
     Page(
-        user = user,
+        profile = profile,
         imageRes = R.drawable.user,
     )
 }
 
 @Composable
-private fun Page(user: User, @DrawableRes imageRes: Int, modifier: Modifier = Modifier) {
+private fun Page(profile: Profile, @DrawableRes imageRes: Int, modifier: Modifier = Modifier) {
     CompositionLocalProvider(
         LocalTextStyle provides MaterialTheme.typography.bodyLarge.copy(
             fontFamily = Glacial
@@ -388,14 +387,16 @@ private fun Page(user: User, @DrawableRes imageRes: Int, modifier: Modifier = Mo
     ) {
         Column(
             horizontalAlignment = Alignment.CenterHorizontally,
-            verticalArrangement = Arrangement.spacedBy(16.dp),
+            verticalArrangement = Arrangement.spacedBy(8.dp),
             modifier = modifier
+                .verticalScroll(rememberScrollState())
         ) {
             Image(
                 painter = painterResource(imageRes),
                 contentDescription = null,
                 modifier = Modifier
-                    .size(500.dp)
+                    .size(width = 500.dp, height = 400.dp)
+
             )
             Column(
                 horizontalAlignment = Alignment.CenterHorizontally,
@@ -407,16 +408,16 @@ private fun Page(user: User, @DrawableRes imageRes: Int, modifier: Modifier = Mo
                     Text(
                         text = buildAnnotatedString {
                             withStyle(style = SpanStyle(fontWeight = FontWeight.Bold)) {
-                                append(user.username)
-                                if (user.age != -1) append(", ${user.age}")
+                                append(profile.username)
+                                if (profile.age != -1) append(", ${profile.age}")
                             }
                         },
-                        fontSize = 28.sp
+                        fontSize = 20.sp
                     )
-                    if (user.location.isNotEmpty()) {
+                    if (profile.location.isNotEmpty()) {
                         Text(
-                            text = user.location,
-                            fontSize = 24.sp,
+                            text = profile.location,
+                            fontSize = 18.sp,
                             fontStyle = FontStyle.Italic
                         )
                     }
@@ -429,21 +430,21 @@ private fun Page(user: User, @DrawableRes imageRes: Int, modifier: Modifier = Mo
                         withStyle(
                             style = SpanStyle(fontStyle = FontStyle.Italic)
                         ) {
-                            append(user.interests)
+                            append(profile.interests)
                         }
                     },
-                    fontSize = 24.sp, textAlign = TextAlign.Center,
+                    fontSize = 20.sp, textAlign = TextAlign.Center,
                 )
-                if (user.bio.isNotEmpty()) {
+                if (profile.bio.isNotEmpty()) {
                     Text(
                         text = buildAnnotatedString {
                             withStyle(style = SpanStyle(fontWeight = FontWeight.Bold)) {
                                 append("Bio:\n")
                             }
-                            append(user.bio)
+                            append(profile.bio)
                         },
                         textAlign = TextAlign.Center,
-                        fontSize = 24.sp,
+                        fontSize = 20.sp,
                     )
                 }
             }
@@ -452,13 +453,12 @@ private fun Page(user: User, @DrawableRes imageRes: Int, modifier: Modifier = Mo
     }
 }
 
-private val user = User(
+private val profile = Profile(
     username = "MusicLover555",
     age = 21,
     location = "Metro Manila",
     bio = "Just someone to talk with :)",
     interests = "New Jeans",
-    onboarded = true
 )
 
 
@@ -466,6 +466,6 @@ private val user = User(
 @Composable
 fun HomeScreenPreview() {
     HuddleTheme {
-        HomeScreen(uiState = HomeUiState.Success(user))
+        HomeScreen(uiState = HomeUiState.Success(profile))
     }
 }

@@ -1,10 +1,13 @@
 package stream.playhuddle.huddle
 
 import androidx.compose.foundation.layout.padding
+import androidx.compose.material3.SnackbarHostState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.navigation.compose.rememberNavController
 import com.ramcosta.composedestinations.DestinationsNavHost
+import com.ramcosta.composedestinations.navigation.dependency
 import com.ramcosta.composedestinations.spec.NavGraphSpec
 import stream.playhuddle.huddle.ui.NavGraphs
 import stream.playhuddle.huddle.ui.composables.BottomBarScreen
@@ -19,9 +22,11 @@ fun HuddleApp(startingGraph: NavGraphSpec) {
     HuddleTheme(dynamicColor = false, darkTheme = false) {
         val navController = rememberNavController()
 
+        val snackbarHostState = remember { SnackbarHostState() }
         HuddleScaffold(
             startRoute = startingGraph,
             navController = navController,
+            snackbarHostState = snackbarHostState,
             topBar = { HuddleToolbar(it.shouldShowScaffoldElements) },
             bottomBar = {
                 HuddleBottomBar(
@@ -34,7 +39,10 @@ fun HuddleApp(startingGraph: NavGraphSpec) {
                 navController = navController,
                 navGraph = NavGraphs.root,
                 startRoute = startingGraph,
-                modifier = Modifier.padding(it)
+                modifier = Modifier.padding(it),
+                dependenciesContainerBuilder = {
+                    dependency(snackbarHostState)
+                }
             )
         }
     }

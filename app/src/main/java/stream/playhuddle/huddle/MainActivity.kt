@@ -8,10 +8,12 @@ import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.viewModels
-import androidx.compose.runtime.collectAsState
-import androidx.compose.runtime.getValue
 import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.flowWithLifecycle
+import androidx.lifecycle.lifecycleScope
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.launch
 
 @AndroidEntryPoint
 class MainActivity : ComponentActivity() {
@@ -20,26 +22,36 @@ class MainActivity : ComponentActivity() {
         const val NAVIGATE_TO = "navigate_to"
     }
 
+    var loading: Boolean = true
+
     private val mainViewModel by viewModels<MainViewModel>()
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         installSplashScreen().apply {
-            setKeepOnScreenCondition {
-                mainViewModel.uiState.value.loading
-            }
+            setKeepOnScreenCondition { loading }
         }
 
-        createChannel(
-            getString(R.string.huddle_notification_channel_id),
-            getString(R.string.huddle_notification_name)
-        )
+        lifecycleScope.launch {
+            mainViewModel.uiState.flowWithLifecycle(lifecycle, Lifecycle.State.STARTED)
+                .collect { uiState ->
+                    loading = uiState is MainUiState.Loading
+
+                    if (uiState is MainUiState.Success) {
+                        createChannel(
+                            getString(R.string.huddle_notification_channel_id),
+                            getString(R.string.huddle_notification_name)
+                        )
 
 
-        setContent {
-            val uiState by mainViewModel.uiState.collectAsState()
-            val startingGraph = uiState.startingGraph
-            HuddleApp(startingGraph = startingGraph)
+                        setContent {
+                            val startingGraph = uiState.startingGraph
+                            HuddleApp(startingGraph = startingGraph)
+                        }
+                    }
+                }
         }
+
+
     }
 
     private fun createChannel(channelId: String, channelName: String) {

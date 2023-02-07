@@ -3,6 +3,8 @@ package stream.playhuddle.huddle.ui.composables
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.SnackbarHost
+import androidx.compose.material3.SnackbarHostState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.navigation.NavBackStackEntry
@@ -17,6 +19,7 @@ import stream.playhuddle.huddle.ui.startAppDestination
 fun HuddleScaffold(
     startRoute: Route,
     navController: NavHostController,
+    snackbarHostState: SnackbarHostState,
     topBar: @Composable (Destination) -> Unit,
     bottomBar: @Composable (Destination) -> Unit,
     content: @Composable (PaddingValues) -> Unit
@@ -28,6 +31,7 @@ fun HuddleScaffold(
     Scaffold(
         topBar = { topBar(destination) },
         bottomBar = { bottomBar(destination) },
+        snackbarHost = { SnackbarHost(hostState = snackbarHostState) },
         content = content
     )
 }

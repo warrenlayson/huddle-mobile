@@ -29,6 +29,7 @@ import com.ramcosta.composedestinations.annotation.Destination
 import com.ramcosta.composedestinations.navigation.DestinationsNavigator
 import stream.playhuddle.huddle.R
 import stream.playhuddle.huddle.ui.composables.LogoWithText
+import stream.playhuddle.huddle.ui.destinations.LoginScreenDestination
 import stream.playhuddle.huddle.ui.destinations.SignUpRouteDestination
 import stream.playhuddle.huddle.ui.theme.md_theme_dark_secondary
 import stream.playhuddle.huddle.ui.theme.md_theme_dark_tertiary
@@ -39,12 +40,17 @@ import stream.playhuddle.huddle.utils.AuthNavGraph
 @Composable
 fun WelcomeRoute(navigator: DestinationsNavigator) {
     WelcomeScreen(
-        navigateToSignUp = { navigator.navigate(SignUpRouteDestination) }
+        navigateToSignUp = { navigator.navigate(SignUpRouteDestination) },
+        navigateToLogin = { navigator.navigate(LoginScreenDestination) }
     )
 }
 
 @Composable
-private fun WelcomeScreen(modifier: Modifier = Modifier, navigateToSignUp: () -> Unit = {}) {
+private fun WelcomeScreen(
+    modifier: Modifier = Modifier,
+    navigateToSignUp: () -> Unit = {},
+    navigateToLogin: () -> Unit = {}
+) {
     Box(modifier = Modifier.fillMaxSize()) {
 
         AndroidView(factory = {
@@ -73,7 +79,7 @@ private fun WelcomeScreen(modifier: Modifier = Modifier, navigateToSignUp: () ->
                 verticalArrangement = Arrangement.spacedBy(8.dp)
             ) {
                 AuthButton(
-                    onClick = { /*TODO*/ },
+                    onClick = navigateToLogin,
                     containerColor = md_theme_dark_secondary,
                 ) {
                     Text(
