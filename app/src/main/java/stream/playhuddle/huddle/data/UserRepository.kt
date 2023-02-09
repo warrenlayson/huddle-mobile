@@ -1,5 +1,6 @@
 package stream.playhuddle.huddle.data
 
+import androidx.lifecycle.viewmodel.compose.viewModel
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.CollectionReference
 import com.google.firebase.firestore.FirebaseFirestore
@@ -17,7 +18,8 @@ import javax.inject.Singleton
 @Singleton
 class UserRepository @Inject constructor(
     private val auth: FirebaseAuth,
-    private val firestore: FirebaseFirestore
+    private val firestore: FirebaseFirestore,
+    private val huddlePreferencesDataSource: HuddlePreferencesDataSource
 ) {
 
     val currentUserId: String get() = auth.currentUser?.uid.orEmpty()
@@ -52,6 +54,7 @@ class UserRepository @Inject constructor(
     }
 
     suspend fun deleteAccount() {
+        huddlePreferencesDataSource.toggleOnboarded(false)
         auth.currentUser?.delete()?.await()
     }
 

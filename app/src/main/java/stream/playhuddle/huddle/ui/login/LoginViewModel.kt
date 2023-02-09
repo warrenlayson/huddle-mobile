@@ -9,6 +9,7 @@ import com.google.firebase.auth.FirebaseAuthException
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.launch
 import stream.playhuddle.huddle.data.UserRepository
+import timber.log.Timber
 import javax.inject.Inject
 
 @HiltViewModel
@@ -37,6 +38,7 @@ class LoginViewModel @Inject constructor(
                 if (e.errorCode == "ERROR_USER_NOT_FOUND") {
                     uiState = uiState.copy(errorMessage = "User not found")
                 }
+                Timber.e(e)
             }
         }
         uiState = uiState.copy(isLoading = false)

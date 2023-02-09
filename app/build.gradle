@@ -41,6 +41,8 @@ android {
         release {
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
+            signingConfig signingConfigs.debug
+            debuggable true
         }
     }
     compileOptions {
@@ -108,6 +110,7 @@ dependencies {
 
     // accompanist
     implementation "com.google.accompanist:accompanist-pager:$accompanist_version"
+    implementation "com.google.accompanist:accompanist-flowlayout:$accompanist_version"
 
     // coil
     implementation "io.coil-kt:coil-bom:$coil_version"

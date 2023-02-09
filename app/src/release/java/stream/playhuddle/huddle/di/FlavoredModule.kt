@@ -17,41 +17,19 @@ import javax.inject.Singleton
 @InstallIn(SingletonComponent::class)
 object FlavoredModule {
 
-    private val EMULATOR_HOST = "192.168.1.13"
-    private val AUTH_EMULATOR_PORT = 9099
-    private val FIRESTORE_EMULATOR_PORT = 8080
-    private val STORAGE_EMULATOR_PORT = 9199
-
     @Provides
     @Singleton
     fun providesAuth(): FirebaseAuth {
-        val auth = Firebase.auth
-
-        auth.useEmulator(EMULATOR_HOST, AUTH_EMULATOR_PORT)
-
-
-        return auth
-
+        return Firebase.auth
     }
 
     @Provides
     @Singleton
-    fun providesFirestore(): FirebaseFirestore {
-        val firestore = Firebase.firestore
-        firestore.useEmulator(EMULATOR_HOST, FIRESTORE_EMULATOR_PORT)
-
-        return firestore
-    }
+    fun providesFirestore(): FirebaseFirestore = Firebase.firestore
 
     @Provides
     @Singleton
-    fun providesStorage(): FirebaseStorage {
-        val storage = Firebase.storage
-
-        storage.useEmulator(EMULATOR_HOST, STORAGE_EMULATOR_PORT)
-
-        return storage
-    }
+    fun providesStorage(): FirebaseStorage = Firebase.storage
 
 
 }

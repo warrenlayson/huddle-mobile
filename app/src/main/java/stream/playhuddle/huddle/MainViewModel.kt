@@ -9,9 +9,11 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
+import kotlinx.coroutines.launch
 import stream.playhuddle.huddle.data.HuddlePreferencesDataSource
 import stream.playhuddle.huddle.data.UserRepository
 import stream.playhuddle.huddle.ui.NavGraphs
+import stream.playhuddle.huddle.ui.NavGraphs.auth
 import stream.playhuddle.huddle.utils.Result
 import stream.playhuddle.huddle.utils.asResult
 import timber.log.Timber
@@ -20,7 +22,7 @@ import javax.inject.Inject
 @HiltViewModel
 class MainViewModel @Inject constructor(
     huddlePreferencesDataSource: HuddlePreferencesDataSource,
-    userRepository: UserRepository
+    private val userRepository: UserRepository
 ) : ViewModel() {
 
     val uiState: StateFlow<MainUiState> =
@@ -35,8 +37,10 @@ class MainViewModel @Inject constructor(
                     Result.Loading -> MainUiState.Loading
                     is Result.Success -> {
                         val (onboarded, user) = result.data
+                        Timber.d(user.toString())
                         val authenticated = user.id.isNotEmpty() && onboarded
-                        Timber.d(onboarded.toString())
+                        Timber.d(authenticated.toString())
+                        Timber.d("onboarded: $onboarded")
                         MainUiState.Success(
                             startingGraph = if (authenticated)
                                 NavGraphs.home
@@ -50,6 +54,10 @@ class MainViewModel @Inject constructor(
                 started = SharingStarted.WhileSubscribed(5_000),
                 initialValue = MainUiState.Loading
             )
+
+    fun onSignOut() = viewModelScope.launch { userRepository.signOut() }
+
+    fun deleteProfile() = viewModelScope.launch { userRepository.deleteAccount() }
 
 }
 

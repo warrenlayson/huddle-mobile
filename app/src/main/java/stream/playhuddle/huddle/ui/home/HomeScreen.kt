@@ -5,9 +5,14 @@ import android.os.Build
 import android.os.CountDownTimer
 import androidx.annotation.DrawableRes
 import androidx.annotation.RequiresApi
+import androidx.compose.animation.core.RepeatMode
+import androidx.compose.animation.core.animateFloat
+import androidx.compose.animation.core.infiniteRepeatable
+import androidx.compose.animation.core.rememberInfiniteTransition
+import androidx.compose.animation.core.tween
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
-import androidx.compose.foundation.clickable
+import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -17,6 +22,7 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.CircularProgressIndicator
@@ -36,8 +42,12 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.draw.scale
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.input.pointer.pointerInput
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
@@ -65,6 +75,7 @@ import stream.playhuddle.huddle.R
 import stream.playhuddle.huddle.data.Profile
 import stream.playhuddle.huddle.ui.destinations.HomeRouteDestination
 import stream.playhuddle.huddle.ui.destinations.InboxRouteDestination
+import stream.playhuddle.huddle.ui.destinations.UserProfileScreenDestination
 import stream.playhuddle.huddle.ui.theme.Bebas
 import stream.playhuddle.huddle.ui.theme.Glacial
 import stream.playhuddle.huddle.ui.theme.HuddleTheme
@@ -87,6 +98,9 @@ fun HomeRoute(navigator: DestinationsNavigator) {
                 }
             }
         },
+        navigateToProfile = {
+            navigator.navigate(UserProfileScreenDestination)
+        },
         uiState = uiState
     )
 }
@@ -98,6 +112,7 @@ const val MAX_PAGE = 7
 private fun HomeScreen(
     uiState: HomeUiState,
     navigateToInbox: () -> Unit = {},
+    navigateToProfile: () -> Unit = {}
 ) {
 
     val scope = rememberCoroutineScope()
@@ -157,7 +172,12 @@ private fun HomeScreen(
                         3 -> PageFour()
                         4 -> PageFive()
                         5 -> PageSix()
-                        6 -> uiState.profile?.let { PageSeven(username = it.username) }
+                        6 -> uiState.profile?.let {
+                            PageSeven(
+                                username = it.username,
+                                navigateToProfile = navigateToProfile
+                            )
+                        }
                     }
                 }
             }
@@ -167,7 +187,7 @@ private fun HomeScreen(
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-private fun PageSeven(username: String) {
+private fun PageSeven(username: String, navigateToProfile: () -> Unit = {}) {
     var open by remember { mutableStateOf(false) }
     Page(
         Profile(
@@ -177,7 +197,12 @@ private fun PageSeven(username: String) {
             age = 25,
             location = "Manila"
         ), imageRes = R.drawable.paulo,
-        modifier = Modifier.clickable { open = true }
+        modifier = Modifier.pointerInput(Unit) {
+            detectTapGestures(
+                onTap = { navigateToProfile() },
+                onDoubleTap = { open = true }
+            )
+        }
     )
     if (open) {
         val context = LocalContext.current
@@ -251,9 +276,12 @@ fun MatchBanner(username: String) {
                 verticalArrangement = Arrangement.spacedBy(8.dp)
             ) {
                 Image(
-                    painter = painterResource(id = R.drawable.paulo_chat_pfp),
+                    painter = painterResource(id = R.drawable.paulo_pfp),
                     contentDescription = null,
-                    modifier = Modifier.size(100.dp),
+                    modifier = Modifier
+                        .size(80.dp)
+                        .clip(CircleShape),
+                    contentScale = ContentScale.Crop
                 )
                 Text(
                     text = "Its_me_Paulo_97",
@@ -263,11 +291,23 @@ fun MatchBanner(username: String) {
                 )
             }
             Spacer(modifier = Modifier.height(8.dp))
-            Image(
-                painter = painterResource(id = R.drawable.user_icon),
-                contentDescription = null,
-                modifier = Modifier.size(100.dp)
+            val infiniteTransition = rememberInfiniteTransition()
+            val scale by infiniteTransition.animateFloat(
+                initialValue = 1f,
+                targetValue = 1.2f,
+                animationSpec = infiniteRepeatable(
+                    animation = tween(1000),
+                    repeatMode = RepeatMode.Reverse
+                )
             )
+            Box(modifier = Modifier.scale(scale)) {
+                Image(
+                    painter = painterResource(id = R.drawable.heart),
+                    contentDescription = null,
+                    modifier = Modifier
+                        .size(100.dp)
+                )
+            }
             Spacer(modifier = Modifier.height(8.dp))
             Column(
                 horizontalAlignment = Alignment.CenterHorizontally,
@@ -276,7 +316,7 @@ fun MatchBanner(username: String) {
                 Image(
                     painter = painterResource(id = R.drawable.user_icon),
                     contentDescription = null,
-                    modifier = Modifier.size(100.dp),
+                    modifier = Modifier.size(80.dp),
                 )
                 Text(
                     text = username,
