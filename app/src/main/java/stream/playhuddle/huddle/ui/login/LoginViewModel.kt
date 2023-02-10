@@ -38,6 +38,9 @@ class LoginViewModel @Inject constructor(
                 if (e.errorCode == "ERROR_USER_NOT_FOUND") {
                     uiState = uiState.copy(errorMessage = "User not found")
                 }
+                if (e.errorCode == "ERROR_INVALID_EMAIL") {
+                    uiState = uiState.copy(errorMessage = "Email is invalid")
+                }
                 Timber.e(e)
             }
         }

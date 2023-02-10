@@ -48,6 +48,9 @@ class SignUpViewModel @Inject constructor(
                             showDialog(true)
                         } catch (e: FirebaseAuthException) {
                             Timber.e(e.errorCode)
+                            if (e.errorCode == "ERROR_EMAIL_ALREADY_IN_USE") {
+                                uiState = uiState.copy(errorMessage = "Email is already in use")
+                            }
                             uiState = uiState.copy(errorMessage = "Unknown error occurred")
                         }
                     }

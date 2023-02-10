@@ -55,6 +55,7 @@ class UserRepository @Inject constructor(
 
     suspend fun deleteAccount() {
         huddlePreferencesDataSource.toggleOnboarded(false)
+        currentCollection().document(currentUserId).delete().await()
         auth.currentUser?.delete()?.await()
     }
 

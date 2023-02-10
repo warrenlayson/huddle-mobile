@@ -17,7 +17,7 @@ import javax.inject.Singleton
 @InstallIn(SingletonComponent::class)
 object FlavoredModule {
 
-    private val EMULATOR_HOST = "192.168.1.13"
+    private val EMULATOR_HOST = "192.168.1.224"
     private val AUTH_EMULATOR_PORT = 9099
     private val FIRESTORE_EMULATOR_PORT = 8080
     private val STORAGE_EMULATOR_PORT = 9199
